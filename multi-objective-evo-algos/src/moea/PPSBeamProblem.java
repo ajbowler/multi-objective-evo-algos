@@ -11,13 +11,6 @@ import org.moeaframework.problem.AbstractProblem;
  */
 public class PPSBeamProblem extends AbstractProblem
 {
-  // dummy values, not actually used
-  private double d1 = 0;
-  private double d2 = 0;
-  private double d3 = 0;
-  private double b = 0;
-  private double L = 0;
-
   private double E1 = 1.60E9;
   private double E2 = 7.00E10;
   private double E3 = 2.00E11;
@@ -31,20 +24,14 @@ public class PPSBeamProblem extends AbstractProblem
   private double p3 = 7780.0;
 
   /**
-   * 5 variables, 2 objectives (the fundamental frequency and the cost), 7
-   * constraints g(x) for the variables.
+   * 5 variables, 2 objectives (the fundamental frequency and the cost), 3
+   * constraints for the mass, and width differences of the materials.
    */
   public PPSBeamProblem()
   {
-    super(5, 2, 7);
+    super(5, 2, 3);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.moeaframework.core.Problem#evaluate(org.moeaframework.core.Solution)
-   */
   @Override
   public void evaluate(Solution solution)
   {
@@ -52,8 +39,14 @@ public class PPSBeamProblem extends AbstractProblem
     double f1 = 0.0;
     double f2 = 0.0;
 
-    double EI = getEI();
-    double mu = getMu();
+    double b = x[0];
+    double L = x[1];
+    double d1 = x[2];
+    double d2 = x[3];
+    double d3 = x[4];
+
+    double EI = getEI(x);
+    double mu = getMu(x);
     double firstHalf = (Math.PI / (2 * L * L));
     double secondHalf = (Math.pow((EI / mu), 0.5));
     f1 = firstHalf * secondHalf;
@@ -69,9 +62,7 @@ public class PPSBeamProblem extends AbstractProblem
   @Override
   public Solution newSolution()
   {
-    // TODO: actually handle constraints
-
-    Solution solution = new Solution(numberOfVariables, numberOfObjectives);
+    Solution solution = new Solution(numberOfVariables, numberOfObjectives, numberOfConstraints);
 
     // b
     solution.setVariable(0, new RealVariable(0.3, 0.55));
@@ -79,64 +70,47 @@ public class PPSBeamProblem extends AbstractProblem
     // L
     solution.setVariable(1, new RealVariable(3, 6));
 
-    // d3
-    solution.setVariable(2, new RealVariable(0.3, 0.6));
-
     // d1
-    solution.setVariable(3, new RealVariable(0.01, 0.58));
+    solution.setVariable(2, new RealVariable(0.01, 0.58));
 
     // d2
-    solution.setVariable(4, new RealVariable(0.01 + d1, 0.58 + d1));
+    solution.setVariable(3, new RealVariable(0.01, 1.16));
+
+    // d3
+    solution.setVariable(4, new RealVariable(0.3, 0.6));
 
     return solution;
   }
 
-  private double getEI()
+  private double getEI(double[] x)
   {
+    double b = x[0];
+    double d1 = x[2];
+    double d2 = x[3];
+    double d3 = x[4];
+
     double result = (2 * b) / 3;
     double first = E1 * Math.pow(d1, 3);
-    double second = E2 * (Math.pow(d2, 3) - Math.pow(d1, 3));
+    double second = E2 * (Math.pow(d2, 3) - Math.pow(d1, b));
     double third = E3 * (Math.pow(d3, 3) - Math.pow(d2, 3));
-    double secondHalf = first + second + third;
-    result *= secondHalf;
+    result *= (first + second + third);
 
     return result;
   }
 
-  private double getMu()
+  private double getMu(double[] x)
   {
+    double b = x[0];
+    double d1 = x[2];
+    double d2 = x[3];
+    double d3 = x[4];
+
     double result = 2 * b;
     double first = p1 * d1;
     double second = p2 * (d2 - d1);
     double third = p3 * (d3 - d2);
-    double secondHalf = first + second + third;
-    result *= secondHalf;
+    result *= (first + second + third);
 
     return result;
-  }
-
-  public double getD1()
-  {
-    return d1;
-  }
-
-  public double getD2()
-  {
-    return d2;
-  }
-
-  public double getD3()
-  {
-    return d3;
-  }
-
-  public double getB()
-  {
-    return b;
-  }
-
-  public double getL()
-  {
-    return L;
   }
 }
