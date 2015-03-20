@@ -29,7 +29,7 @@ public class PPSBeamProblem extends AbstractProblem
    */
   public PPSBeamProblem()
   {
-    super(5, 2, 3);
+    super(5, 2);
   }
 
   @Override
@@ -62,7 +62,7 @@ public class PPSBeamProblem extends AbstractProblem
   @Override
   public Solution newSolution()
   {
-    Solution solution = new Solution(numberOfVariables, numberOfObjectives, numberOfConstraints);
+    Solution solution = new Solution(numberOfVariables, numberOfObjectives);
 
     // b
     solution.setVariable(0, new RealVariable(0.3, 0.55));
