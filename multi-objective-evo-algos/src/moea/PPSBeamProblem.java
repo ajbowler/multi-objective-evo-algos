@@ -29,15 +29,17 @@ public class PPSBeamProblem extends AbstractProblem
    */
   public PPSBeamProblem()
   {
-    super(5, 2);
+    super(5, 2, 3);
   }
 
   @Override
   public void evaluate(Solution solution)
   {
     double[] x = EncodingUtils.getReal(solution);
-    double f1 = 0.0;
-    double f2 = 0.0;
+    double[] f = new double[2];
+    double g3 = 0.0;
+    double g6 = 0.0;
+    double g7 = 0.0;
 
     double b = x[0];
     double L = x[1];
@@ -49,35 +51,61 @@ public class PPSBeamProblem extends AbstractProblem
     double mu = getMu(x);
     double firstHalf = (Math.PI / (2 * L * L));
     double secondHalf = (Math.pow((EI / mu), 0.5));
-    f1 = firstHalf * secondHalf;
+    f[0] = firstHalf * secondHalf;
 
     firstHalf = 2 * b * L;
     secondHalf = ((c1 * d1) + (c2 * (d2 - d1)) + (c3 * (d3 - d2)));
-    f2 = firstHalf * secondHalf;
+    f[1] = firstHalf * secondHalf;
 
-    solution.setObjective(0, f1);
-    solution.setObjective(1, f2);
+    // mass constraint
+    if (L * mu >= 2000 && L * mu <= 2800)
+      g3 = 0.0;
+    else
+    {
+      if (L * mu > 2800)
+        g3 = (L * mu) - 2800;
+      else
+        g3 = (L * mu) - 2000;
+    }
+
+    // width constraint
+    if (d2 - d1 >= 0.01 && d2 - d1 <= 0.58)
+      g6 = 0.0;
+    else
+    {
+      if (d2 - d1 > 0.58)
+        g6 = (d2 - d1) - 0.58;
+      else
+        g6 = (d2 - d1) - 0.01;
+    }
+
+    // width constraint
+    if (d3 - d2 >= 0.01 && d3 - d2 <= 0.57)
+      g7 = 0.0;
+    else
+    {
+      if (d3 - d2 > 0.57)
+        g7 = (d3 - d2) - 0.57;
+      else
+        g7 = (d3 - d2) - 0.01;
+    }
+
+    solution.setObjectives(f);
+    solution.setConstraint(0, g3);
+    solution.setConstraint(1, g6);
+    solution.setConstraint(2, g7);
   }
 
   @Override
   public Solution newSolution()
   {
-    Solution solution = new Solution(numberOfVariables, numberOfObjectives);
+    Solution solution = new Solution(numberOfVariables, numberOfObjectives, numberOfConstraints);
 
-    // b
-    solution.setVariable(0, new RealVariable(0.3, 0.55));
-
-    // L
-    solution.setVariable(1, new RealVariable(3, 6));
-
-    // d1
-    solution.setVariable(2, new RealVariable(0.01, 0.58));
-
-    // d2
-    solution.setVariable(3, new RealVariable(0.01, 1.16));
-
-    // d3
-    solution.setVariable(4, new RealVariable(0.3, 0.6));
+    solution.setVariable(0, new RealVariable(0.3, 0.55)); // b
+    solution.setVariable(1, new RealVariable(3, 6)); // L
+    solution.setVariable(2, new RealVariable(0.01, 0.58)); // d1
+    solution.setVariable(3, new RealVariable(0.01, 1.16)); // d2
+    solution.setVariable(4, new RealVariable(0.3, 0.6)); // d3
 
     return solution;
   }
@@ -89,11 +117,19 @@ public class PPSBeamProblem extends AbstractProblem
     double d2 = x[3];
     double d3 = x[4];
 
-    double result = (2 * b) / 3;
-    double first = E1 * Math.pow(d1, 3);
-    double second = E2 * (Math.pow(d2, 3) - Math.pow(d1, b));
-    double third = E3 * (Math.pow(d3, 3) - Math.pow(d2, 3));
-    result *= (first + second + third);
+    double fraction = (2 * b) / 3;
+
+    double d1_3 = Math.pow(d1, 3);
+    double d2_3 = Math.pow(d2, 3);
+    double d3_3 = Math.pow(d3, 3);
+
+    double first = E1 * d1_3;
+    double second = (d2_3 - d1_3) * E2;
+    double third = (d3_3 - d2_3) * E3;
+
+    double sum = first + second + third;
+
+    double result = fraction * sum;
 
     return result;
   }
@@ -109,7 +145,8 @@ public class PPSBeamProblem extends AbstractProblem
     double first = p1 * d1;
     double second = p2 * (d2 - d1);
     double third = p3 * (d3 - d2);
-    result *= (first + second + third);
+    double sum = first + second + third;
+    result = result * sum;
 
     return result;
   }
