@@ -12,6 +12,8 @@ public class plotParetoFront extends ApplicationFrame
 {
   private static final long serialVersionUID = 1L;
 
+  public JFreeChart pareto;
+
   public plotParetoFront(String chartTitle, float[][] data)
   {
     super(chartTitle);
@@ -23,6 +25,7 @@ public class plotParetoFront extends ApplicationFrame
     rangeAxis.setAutoRangeIncludesZero(false);
     final FastScatterPlot plot = new FastScatterPlot(data, domainAxis, rangeAxis);
     final JFreeChart chart = new JFreeChart("Fast Scatter Plot", plot);
+    this.pareto = chart;
     // chart.setLegend(null);
 
     // force aliasing of the rendered content..
