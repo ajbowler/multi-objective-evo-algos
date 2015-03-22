@@ -17,37 +17,38 @@ public class PPSBeamSolver
 {
   public static void main(String[] args) throws IOException
   {
-    // configure and run this experiment
-    NondominatedPopulation result = new Executor().withProperty("populationSize", 10000)
-        .withProblem("moea.PPSBeamProblem").withAlgorithm("NSGAII").withMaxEvaluations(10000).distributeOnAllCores()
-        .run();
+    // Run this with two different algorithms.
+    String[] algorithms = { "NSGAII", "GDE3" };
 
-    // display the results
-    int COUNT = result.size();
-    System.out.println(COUNT);
-    float[][] data = new float[2][COUNT];
-    int i = 0;
-    System.out.format("FF  Cost%n");
-    for (Solution solution : result)
+    for (int i = 0; i < algorithms.length; i++)
     {
-      System.out.format("%.4f      %.4f%n", solution.getObjective(0), solution.getObjective(1));
-      data[0][i] = (float) solution.getObjective(0);
-      data[1][i] = (float) solution.getObjective(1);
-      i++;
+      // configure and run this experiment
+      NondominatedPopulation result = new Executor().withProblem("moea.PPSBeamProblem").withAlgorithm(algorithms[i])
+          .withMaxEvaluations(10000).distributeOnAllCores().run();
+
+      // display the results
+      int COUNT = result.size();
+      float[][] data = new float[2][COUNT];
+      int j = 0;
+      System.out.format("FF  Cost%n");
+      for (Solution solution : result)
+      {
+        System.out.format("%.4f      %.4f%n", solution.getObjective(0), solution.getObjective(1));
+        data[0][j] = (float) solution.getObjective(0);
+        data[1][j] = (float) solution.getObjective(1);
+        j++;
+      }
+
+      plotParetoFront plotChart = new plotParetoFront(algorithms[i], data);
+      plotChart.pack();
+      RefineryUtilities.centerFrameOnScreen(plotChart);
+      plotChart.setVisible(true);
+
+      Analyzer analyzer = new Analyzer().withProblem("moea.PPSBeamProblem").includeHypervolume();
+
+      Executor nsgaii = new Executor().withProblem("moea.PPSBeamProblem").withMaxEvaluations(10000);
+      analyzer.addAll(algorithms[i], nsgaii.withAlgorithm(algorithms[i]).runSeeds(50));
+      analyzer.printAnalysis();
     }
-
-    plotParetoFront plotChart = new plotParetoFront("Pareto solutions", data);
-    plotChart.pack();
-    RefineryUtilities.centerFrameOnScreen(plotChart);
-    plotChart.setVisible(true);
-
-    Analyzer analyzer = new Analyzer().withProblem("moea.PPSBeamProblem").includeHypervolume();
-
-    Executor executor = new Executor().withProblem("moea.PPSBeamProblem").withProperty("populationSize", 10000)
-        .withMaxEvaluations(10000);
-    analyzer.addAll("NSGAII", executor.withAlgorithm("NSGAII").runSeeds(1));
-
-    analyzer.printAnalysis();
-
   }
 }

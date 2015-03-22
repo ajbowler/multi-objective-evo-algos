@@ -10,10 +10,6 @@ import org.jfree.ui.ApplicationFrame;
 
 public class plotParetoFront extends ApplicationFrame
 {
-
-  /**
-	 * 
-	 */
   private static final long serialVersionUID = 1L;
 
   public plotParetoFront(String chartTitle, float[][] data)
@@ -21,9 +17,9 @@ public class plotParetoFront extends ApplicationFrame
     super(chartTitle);
     // TODO Auto-generated constructor stub
 
-    final NumberAxis domainAxis = new NumberAxis("Objective 1");
+    final NumberAxis domainAxis = new NumberAxis("Fundamental Frequency");
     domainAxis.setAutoRangeIncludesZero(false);
-    final NumberAxis rangeAxis = new NumberAxis("Objective 2");
+    final NumberAxis rangeAxis = new NumberAxis("Cost");
     rangeAxis.setAutoRangeIncludesZero(false);
     final FastScatterPlot plot = new FastScatterPlot(data, domainAxis, rangeAxis);
     final JFreeChart chart = new JFreeChart("Fast Scatter Plot", plot);
@@ -43,5 +39,4 @@ public class plotParetoFront extends ApplicationFrame
 
     setContentPane(panel);
   }
-
 }
