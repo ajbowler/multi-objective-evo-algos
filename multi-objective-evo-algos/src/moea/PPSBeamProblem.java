@@ -25,13 +25,18 @@ public class PPSBeamProblem extends AbstractProblem
 
   /**
    * 5 variables, 2 objectives (the fundamental frequency and the cost), 3
-   * constraints for the mass, and width differences of the materials.
+   * constraints for the mass and width differences of the materials.
    */
   public PPSBeamProblem()
   {
     super(5, 2, 3);
   }
 
+  /**
+   * Evaluates the generated solution for this problem and calculates and sets
+   * the constraint violations defined in the function, if any are violated in
+   * the first place.
+   */
   @Override
   public void evaluate(Solution solution)
   {
@@ -68,7 +73,7 @@ public class PPSBeamProblem extends AbstractProblem
         g3 = (L * mu) - 2000;
     }
 
-    // width constraint
+    // material constraint
     if (d2 - d1 >= 0.01 && d2 - d1 <= 0.58)
       g6 = 0.0;
     else
@@ -79,7 +84,7 @@ public class PPSBeamProblem extends AbstractProblem
         g6 = (d2 - d1) - 0.01;
     }
 
-    // width constraint
+    // material constraint
     if (d3 - d2 >= 0.01 && d3 - d2 <= 0.57)
       g7 = 0.0;
     else
@@ -96,6 +101,9 @@ public class PPSBeamProblem extends AbstractProblem
     solution.setConstraint(2, g7);
   }
 
+  /**
+   * Creates the Solution object for this problem.
+   */
   @Override
   public Solution newSolution()
   {
@@ -110,6 +118,10 @@ public class PPSBeamProblem extends AbstractProblem
     return solution;
   }
 
+  /**
+   * Returns the EI coefficient calculated from the provided set of variables
+   * for this problem.
+   */
   private double getEI(double[] x)
   {
     double b = x[0];
@@ -134,6 +146,10 @@ public class PPSBeamProblem extends AbstractProblem
     return result;
   }
 
+  /**
+   * Returns the mu coefficient calculated from the provided set of variables
+   * for this problem.
+   */
   private double getMu(double[] x)
   {
     double b = x[0];

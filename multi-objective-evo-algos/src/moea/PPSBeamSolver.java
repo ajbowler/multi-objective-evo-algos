@@ -65,8 +65,13 @@ public class PPSBeamSolver
       analyzer.printAnalysis(txt);
       txt.close();
     }
+    System.out.println("Done!");
   }
 
+  /**
+   * Returns a list of File objects pointing to a jpg for a pareto chart and a
+   * txt file for the corresponding data.
+   */
   private static List<File> generateFiles(String algorithm)
   {
     String timeStamp = setTimeStamp();
@@ -80,6 +85,9 @@ public class PPSBeamSolver
     return files;
   }
 
+  /**
+   * Returns a timestamp for file names.
+   */
   private static String setTimeStamp()
   {
     SimpleDateFormat sdfDate = new SimpleDateFormat("MM-dd HH-mm-ss");

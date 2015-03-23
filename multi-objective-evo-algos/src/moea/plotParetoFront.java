@@ -8,6 +8,12 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.FastScatterPlot;
 import org.jfree.ui.ApplicationFrame;
 
+/**
+ * 
+ * @author Shan He
+ * @author Andrew Bowler
+ *
+ */
 public class plotParetoFront extends ApplicationFrame
 {
   private static final long serialVersionUID = 1L;
