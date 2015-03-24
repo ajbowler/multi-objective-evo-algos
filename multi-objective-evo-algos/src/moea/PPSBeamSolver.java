@@ -57,10 +57,10 @@ public class PPSBeamSolver
       plotChart.setVisible(true);
       ChartUtilities.saveChartAsJPEG(files.get(1), plotChart.pareto, plotChart.getWidth(), plotChart.getHeight());
 
-      // Write the hypervolume
+      // Write the hypervolume and spacing
       txt.print("\n\n");
 
-      Analyzer analyzer = new Analyzer().withProblem("moea.PPSBeamProblem").includeHypervolume();
+      Analyzer analyzer = new Analyzer().withProblem("moea.PPSBeamProblem").includeHypervolume().includeSpacing();
       analyzer.add(algorithms[i], result);
       analyzer.printAnalysis(txt);
       txt.close();
